@@ -20,9 +20,35 @@ OpenHands SDK docs:
 
 ## Install
 
+`whatsupdoc` is a Python package (name: `whatsupdoc`) with a CLI entrypoint (command: `whatsupdoc`).
+
+### Recommended: install into a virtual environment
+
 ```bash
-pip install -e .
+python -m venv .venv
+# mac/linux
+source .venv/bin/activate
+
+python -m pip install -U pip
+python -m pip install -e .
 ```
+
+#### Windows (WSL)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+python -m pip install -e .
+```
+
+
+Notes:
+- `pip install -e .` means an **editable install** (good for local development; code changes take effect without reinstalling).
+- If you only want a normal install, use: `python -m pip install .`
+- If `whatsupdoc` isn’t found after install, run it as a module:
+  - `python -m whatsupdoc --help`
+  - (or add your pip scripts dir to `PATH`, often `~/.local/bin`)
 
 ## Run (headless)
 
