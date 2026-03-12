@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whatsupdoc"
+version = "0.1.0"
+description = "OpenHands Software Agent SDK demo: generate Mintlify technical docs for a repo and open a PR"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "openhands", email = "openhands@all-hands.dev"}]
+dependencies = [
+  "openhands-sdk>=1.0.0",
+  "openhands-tools>=1.0.0",
+  "requests>=2.31.0",
+  "typer>=0.12.3",
+  "rich>=13.7.1",
+  "python-dotenv>=1.0.1",
+]
+
+[project.scripts]
+whatsupdoc = "whatsupdoc.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
