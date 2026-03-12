@@ -24,6 +24,27 @@ def parse_github_repo(target: str) -> GitHubRepo:
     return GitHubRepo(owner=m.group("owner"), name=m.group("repo"))
 
 
+
+def get_repo_default_branch(*, repo: GitHubRepo, token: str | None = None) -> str | None:
+    url = f"https://api.github.com/repos/{repo.owner}/{repo.name}"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    resp = requests.get(url, headers=headers, timeout=60)
+    if resp.status_code >= 300:
+        return None
+
+    data = resp.json()
+    default_branch = data.get("default_branch")
+    if isinstance(default_branch, str) and default_branch:
+        return default_branch
+    return None
+
+
 def create_pull_request(
     *,
     repo: GitHubRepo,
