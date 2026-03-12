@@ -10,8 +10,8 @@ class GitError(RuntimeError):
     pass
 
 
-def _run(cmd: list[str], *, cwd: Path) -> str:
-    proc = subprocess.run(
+def _run_result(cmd: list[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
         cmd,
         cwd=str(cwd),
         check=False,
@@ -19,8 +19,19 @@ def _run(cmd: list[str], *, cwd: Path) -> str:
         stderr=subprocess.STDOUT,
         text=True,
     )
+
+
+def _run(cmd: list[str], *, cwd: Path) -> str:
+    proc = _run_result(cmd, cwd=cwd)
     if proc.returncode != 0:
         raise GitError(f"Command failed ({proc.returncode}): {' '.join(cmd)}\n{proc.stdout}")
+    return proc.stdout.strip()
+
+
+def _try_run(cmd: list[str], *, cwd: Path) -> str | None:
+    proc = _run_result(cmd, cwd=cwd)
+    if proc.returncode != 0:
+        return None
     return proc.stdout.strip()
 
 
@@ -35,8 +46,68 @@ def clone_repo(url: str, dest: Path) -> None:
 
 
 def get_default_branch(repo_dir: Path) -> str:
-    ref = _run(["git", "symbolic-ref", "refs/remotes/origin/HEAD"], cwd=repo_dir)
-    return ref.split("/")[-1]
+    ref = _try_run(["git", "symbolic-ref", "refs/remotes/origin/HEAD"], cwd=repo_dir)
+    if ref:
+        return ref.split("/")[-1]
+
+    remote_show = _try_run(["git", "remote", "show", "origin"], cwd=repo_dir)
+    if remote_show:
+        for line in remote_show.splitlines():
+            if line.strip().startswith("HEAD branch:"):
+                head = line.split(":", 1)[1].strip()
+                if head and head != "(unknown)":
+                    return head
+
+    remote_branches = _try_run(["git", "branch", "-r"], cwd=repo_dir) or ""
+    names: list[str] = []
+    for line in remote_branches.splitlines():
+        line = line.strip()
+        if not line.startswith("origin/"):
+            continue
+        name = line.removeprefix("origin/")
+        if name == "HEAD":
+            continue
+        names.append(name)
+
+    for preferred in ("main", "master"):
+        if preferred in names:
+            return preferred
+
+    if names:
+        return names[0]
+
+    raise GitError(
+        "Unable to determine the target repo's default branch. "
+        "This usually means the target repository is empty (no commits/branches). "
+        "Create an initial commit in the target repo (e.g., add a README on GitHub) "
+        "or pass --base-branch."
+    )
+
+
+
+def repo_has_commits(repo_dir: Path) -> bool:
+    return _try_run(["git", "rev-parse", "--verify", "HEAD"], cwd=repo_dir) is not None
+
+
+def init_empty_repo_with_initial_commit(repo_dir: Path, *, base_branch: str) -> None:
+    """Initialize an empty cloned repo so we can create feature branches/PRs.
+
+    GitHub allows creating empty repositories without any commits. `git clone` then
+    yields a repo with no `HEAD`, and commands like `git checkout -b ...` fail.
+
+    We fix this by creating an orphan base branch and making a small initial commit.
+    """
+
+    _run(["git", "checkout", "--orphan", base_branch], cwd=repo_dir)
+
+    readme = repo_dir / "README.md"
+    if not readme.exists():
+        readme.write_text(
+            "# Repository\n\nInitialized by whatsupdoc.\n",
+            encoding="utf-8",
+        )
+
+    commit_all(repo_dir, "chore: initialize repository")
 
 
 def checkout_new_branch(repo_dir: Path, branch: str) -> None:

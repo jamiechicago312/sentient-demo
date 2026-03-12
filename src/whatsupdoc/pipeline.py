@@ -7,15 +7,18 @@ from rich.console import Console
 
 from .agent_runner import run_openhands_doc_agent
 from .git_utils import (
+    GitError,
     checkout_new_branch,
     clone_repo,
     commit_all,
     ensure_empty_dir,
     get_default_branch,
+    init_empty_repo_with_initial_commit,
     push_branch,
+    repo_has_commits,
     set_push_remote_with_token,
 )
-from .github import create_pull_request, parse_github_repo
+from .github import create_pull_request, get_repo_default_branch, parse_github_repo
 from .prompt import build_docgen_prompt
 
 console = Console()
@@ -51,8 +54,27 @@ def run_pipeline(
     console.print(f"Cloning target repo: {target}")
     clone_repo(_normalize_repo_url(target), target_dir)
 
+    gh = parse_github_repo(target)
+
     if base_branch is None:
-        base_branch = get_default_branch(target_dir)
+        try:
+            base_branch = get_default_branch(target_dir)
+        except GitError:
+            base_branch = get_repo_default_branch(repo=gh, token=github_token) or "main"
+
+    if not repo_has_commits(target_dir):
+        console.print(
+            f"Target repo has no commits; creating an initial commit on '{base_branch}' so PRs can be opened."
+        )
+        init_empty_repo_with_initial_commit(target_dir, base_branch=base_branch)
+
+        if not dry_run:
+            if not github_token:
+                raise RuntimeError("github_token is required unless dry_run is set")
+
+            set_push_remote_with_token(target_dir, token=github_token, owner=gh.owner, repo=gh.name)
+            console.print(f"Pushing initial base branch: {base_branch}")
+            push_branch(target_dir, base_branch)
 
     branch = _make_branch_name(source)
     checkout_new_branch(target_dir, branch)
@@ -81,8 +103,6 @@ def run_pipeline(
 
     if not github_token:
         raise RuntimeError("github_token is required unless dry_run is set")
-
-    gh = parse_github_repo(target)
 
     set_push_remote_with_token(target_dir, token=github_token, owner=gh.owner, repo=gh.name)
 

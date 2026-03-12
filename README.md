@@ -17,6 +17,7 @@ OpenHands SDK docs:
 - A GitHub token with permission to push to the target repo (`GITHUB_TOKEN`)
 - An LLM API key compatible with OpenHands SDK (`LLM_API_KEY`)
   - For OpenHands Cloud, get a key from: https://app.all-hands.dev/settings/api-keys
+- The target repo should ideally already have at least 1 commit. If it's empty, whatsupdoc will create an initial commit on the default branch so it can open a PR.
 
 ## Install
 

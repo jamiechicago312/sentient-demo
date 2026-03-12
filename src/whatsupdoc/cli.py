@@ -7,6 +7,7 @@ import typer
 from dotenv import load_dotenv
 from rich.console import Console
 
+from .git_utils import GitError
 from .pipeline import run_pipeline
 
 
@@ -85,18 +86,22 @@ def generate(
     if not dry_run and not github_token:
         raise typer.BadParameter("Missing GitHub token (set GITHUB_TOKEN or pass --github-token).")
 
-    pr_url = run_pipeline(
-        source=source,
-        target=target,
-        coverage=coverage,
-        workspace=workspace,
-        base_branch=base_branch,
-        llm_model=llm_model,
-        llm_api_key=llm_api_key,
-        llm_base_url=llm_base_url,
-        github_token=github_token,
-        dry_run=dry_run,
-    )
+    try:
+        pr_url = run_pipeline(
+            source=source,
+            target=target,
+            coverage=coverage,
+            workspace=workspace,
+            base_branch=base_branch,
+            llm_model=llm_model,
+            llm_api_key=llm_api_key,
+            llm_base_url=llm_base_url,
+            github_token=github_token,
+            dry_run=dry_run,
+        )
+    except GitError as e:
+        console.print(f"\n[red]Git error:[/red] {e}")
+        raise typer.Exit(code=2) from e
 
     if pr_url:
         console.print(f"\nPR created: [bold]{pr_url}[/bold]")
