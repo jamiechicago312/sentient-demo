@@ -24,13 +24,37 @@ OpenHands SDK docs:
 
 ### Recommended: install into a virtual environment
 
+A **virtual environment** (venv) is just a folder (`.venv/`) that contains its own Python + installed packages.
+
+- You create it **once**
+- You “turn it on” (activate) in each new terminal
+
+#### First-time setup (run once per repo clone)
+
 ```bash
+cd sentient-demo
+
 python3 -m venv .venv
-# mac/linux/WSL
 source .venv/bin/activate
 
 python -m pip install -U pip
 python -m pip install -e .
+```
+
+#### After that (each new terminal)
+
+```bash
+cd sentient-demo
+source .venv/bin/activate
+
+# now the CLI should be available:
+whatsupdoc --help
+```
+
+If you don’t want to activate the venv, you can run directly:
+
+```bash
+./.venv/bin/python -m whatsupdoc --help
 ```
 
 #### WSL / Ubuntu troubleshooting
@@ -39,7 +63,7 @@ If `python3 -m venv .venv` fails with `ensurepip is not available`, install venv
 
 ```bash
 sudo apt update
-sudo apt install -y python3-venv
+sudo apt install -y python3-venv python3-pip
 # If you're on Ubuntu 24.04 / Python 3.12 and it still fails:
 # sudo apt install -y python3.12-venv
 ```
@@ -51,10 +75,7 @@ Notes:
 - `pip install -e .` must include the path argument (the dot): `python -m pip install -e .`
 - `pip install -e .` is an **editable install** (good for local development; code changes take effect without reinstalling).
 - If you only want a normal install, use: `python -m pip install .`
-- This project is not published to PyPI, so `pip install whatsupdoc` won’t work (install from the repo).
-- If `whatsupdoc` isn’t found after install, run it as a module:
-  - `python -m whatsupdoc --help`
-  - or add your pip scripts dir to `PATH` (often `~/.local/bin`)
+- This project is not published to PyPI, so `pip install whatsupdoc` won’t work (install from this repo).
 
 ## Run (headless)
 
@@ -64,22 +85,30 @@ This repo supports loading secrets from a local `.env` file via `python-dotenv`.
 The `.env` file is already gitignored.
 
 ```bash
+# Activate the venv (do this each time you open a new terminal)
+source .venv/bin/activate
+
 cp .env.example .env
 # edit .env with your keys
 
-# Most reliable invocation (doesn't depend on your PATH):
 python -m whatsupdoc \
   --source https://github.com/OpenHands/software-agent-sdk \
   --target https://github.com/<you>/<your-docs-repo> \
   --coverage "overview,setup,architecture,api"
 
-# If the `whatsupdoc` command is on your PATH (e.g. you activated the venv):
+# If you prefer the console script (same thing):
 # whatsupdoc --source ... --target ...
+
+# If you *didn't* activate the venv, you can run:
+# ./.venv/bin/python -m whatsupdoc --source ... --target ...
 ```
 
 ### Option B: export environment variables
 
 ```bash
+# Activate the venv (do this each time you open a new terminal)
+source .venv/bin/activate
+
 export LLM_API_KEY="..."
 export LLM_MODEL="openhands/claude-sonnet-4-5-20250929"  # example
 export GITHUB_TOKEN="..."

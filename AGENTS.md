@@ -10,10 +10,14 @@ A minimal demo project that builds a documentation-generation agent using the Op
 # On WSL/Ubuntu you may need:
 # sudo apt update && sudo apt install -y python3-venv python3-pip
 
+# First time only:
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -U pip
 python -m pip install -e .
+
+# Each new terminal after that:
+# source .venv/bin/activate
 
 export LLM_API_KEY=...          # OpenHands Cloud or other LiteLLM-supported provider
 export LLM_MODEL=openhands/claude-sonnet-4-5-20250929
