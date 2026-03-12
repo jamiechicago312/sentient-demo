@@ -26,6 +26,23 @@ pip install -e .
 
 ## Run (headless)
 
+### Option A: use a local `.env` file (recommended)
+
+This repo supports loading secrets from a local `.env` file via `python-dotenv`.
+The `.env` file is already gitignored.
+
+```bash
+cp .env.example .env
+# edit .env with your keys
+
+whatsupdoc \
+  --source https://github.com/OpenHands/software-agent-sdk \
+  --target https://github.com/<you>/<your-docs-repo> \
+  --coverage "overview,setup,architecture,api"
+```
+
+### Option B: export environment variables
+
 ```bash
 export LLM_API_KEY="..."
 export LLM_MODEL="openhands/claude-sonnet-4-5-20250929"  # example

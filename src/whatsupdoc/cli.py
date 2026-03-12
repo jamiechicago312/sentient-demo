@@ -4,9 +4,15 @@ import os
 from pathlib import Path
 
 import typer
+from dotenv import load_dotenv
 from rich.console import Console
 
 from .pipeline import run_pipeline
+
+
+# Load local secrets from a .env file (if present). This keeps secrets out of shell history.
+# The file should be gitignored (this repo ships with `.gitignore` including `.env`).
+load_dotenv(override=False)
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 console = Console()
