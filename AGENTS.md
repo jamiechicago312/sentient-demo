@@ -19,9 +19,9 @@ export LLM_API_KEY=...          # OpenHands Cloud or other LiteLLM-supported pro
 export LLM_MODEL=openhands/claude-sonnet-4-5-20250929
 export GITHUB_TOKEN=...         # GitHub PAT with push permission on target repo
 
-whatsupdoc --help
-# if needed:
 python -m whatsupdoc --help
+# If you installed the console script onto your PATH you can also run:
+# whatsupdoc --help
 ```
 
 ## Layout

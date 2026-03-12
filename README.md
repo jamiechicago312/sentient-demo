@@ -67,10 +67,14 @@ The `.env` file is already gitignored.
 cp .env.example .env
 # edit .env with your keys
 
-whatsupdoc \
+# Most reliable invocation (doesn't depend on your PATH):
+python -m whatsupdoc \
   --source https://github.com/OpenHands/software-agent-sdk \
   --target https://github.com/<you>/<your-docs-repo> \
   --coverage "overview,setup,architecture,api"
+
+# If the `whatsupdoc` command is on your PATH (e.g. you activated the venv):
+# whatsupdoc --source ... --target ...
 ```
 
 ### Option B: export environment variables
@@ -80,14 +84,12 @@ export LLM_API_KEY="..."
 export LLM_MODEL="openhands/claude-sonnet-4-5-20250929"  # example
 export GITHUB_TOKEN="..."
 
-# If you installed with `pip install -e .` but `whatsupdoc` isn't on PATH,
-# you can always run via: `python -m whatsupdoc ...`
-
-whatsupdoc \
+python -m whatsupdoc \
   --source https://github.com/OpenHands/software-agent-sdk \
   --target https://github.com/<you>/<your-docs-repo> \
   --coverage "overview,setup,architecture,api"
 ```
+
 
 ### Preview with Mintlify
 
