@@ -7,11 +7,18 @@ A minimal demo project that builds a documentation-generation agent using the Op
 ## Quickstart
 
 ```bash
-pip install -e .
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+python -m pip install -e .
+
 export LLM_API_KEY=...          # OpenHands Cloud or other LiteLLM-supported provider
 export LLM_MODEL=openhands/claude-sonnet-4-5-20250929
 export GITHUB_TOKEN=...         # GitHub PAT with push permission on target repo
+
 whatsupdoc --help
+# if needed:
+python -m whatsupdoc --help
 ```
 
 ## Layout
