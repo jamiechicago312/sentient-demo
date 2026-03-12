@@ -7,7 +7,10 @@ A minimal demo project that builds a documentation-generation agent using the Op
 ## Quickstart
 
 ```bash
-python -m venv .venv
+# On WSL/Ubuntu you may need:
+# sudo apt update && sudo apt install -y python3-venv python3-pip
+
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -U pip
 python -m pip install -e .

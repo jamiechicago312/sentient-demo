@@ -25,30 +25,36 @@ OpenHands SDK docs:
 ### Recommended: install into a virtual environment
 
 ```bash
-python -m venv .venv
-# mac/linux
+python3 -m venv .venv
+# mac/linux/WSL
 source .venv/bin/activate
 
 python -m pip install -U pip
 python -m pip install -e .
 ```
 
-#### Windows (WSL)
+#### WSL / Ubuntu troubleshooting
+
+If `python3 -m venv .venv` fails with `ensurepip is not available`, install venv support:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -U pip
-python -m pip install -e .
+sudo apt update
+sudo apt install -y python3-venv
+# If you're on Ubuntu 24.04 / Python 3.12 and it still fails:
+# sudo apt install -y python3.12-venv
 ```
 
+If `python` is not found **outside** the venv, that’s normal on some distros—use `python3`.
+(Inside the venv, `python` should exist after activation.)
 
 Notes:
-- `pip install -e .` means an **editable install** (good for local development; code changes take effect without reinstalling).
+- `pip install -e .` must include the path argument (the dot): `python -m pip install -e .`
+- `pip install -e .` is an **editable install** (good for local development; code changes take effect without reinstalling).
 - If you only want a normal install, use: `python -m pip install .`
+- This project is not published to PyPI, so `pip install whatsupdoc` won’t work (install from the repo).
 - If `whatsupdoc` isn’t found after install, run it as a module:
   - `python -m whatsupdoc --help`
-  - (or add your pip scripts dir to `PATH`, often `~/.local/bin`)
+  - or add your pip scripts dir to `PATH` (often `~/.local/bin`)
 
 ## Run (headless)
 
